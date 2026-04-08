@@ -3,6 +3,7 @@ name: Deploy Slidev
 on:
   push:
     branches: [main]
+  workflow_dispatch: # Позволяет запускать вручную
 
 permissions:
   contents: read
@@ -14,13 +15,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+          
       - run: npm ci
-      - run: npm run build -- --base /oop1/
-      - uses: actions/upload-pages-artifact@v3
+      
+      # Важно: добавьте этот шаг перед билдом
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        
+      - name: Build Slidev
+        # Убедитесь, что /oop1/ совпадает с именем репозитория
+        run: npm run build -- --base /oop1/
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
